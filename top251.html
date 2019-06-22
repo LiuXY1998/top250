@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>豆瓣电影评分top250</title>
+    <script src="./js/jquery-3.4.1.min.js"></script>
+    <script src="./js/data.js"></script>
+    <script src="./js/echarts.js"></script>
+
+</head>
+<body>
+<div class="container" style="width: 1000px;height:570px;float: left;background: #cccccc;margin-left:100px; "></div>
+<script>
+    let container = document.querySelector('.container');
+
+    let  mycharts =echarts.init(container);
+
+    let selected = {};
+    let series = [];
+
+    categories.forEach(category=>{
+        let movies = data.filter(ele=>ele[4].includes(category));
+
+        if(category=='全部'){
+            selected[category]='true';
+        }else{
+            selected[category]='false';
+        }
+
+        let obj = {
+            name: category,
+            data: category=='全部' ? data:movies,
+            type: 'scatter',
+            symbolSize: function (data) {
+                return Math.ceil(data[2]/10);
+            },
+            label: {
+                emphasis: {
+                    show: true,
+                    formatter: function (param) {
+                        return param.data[3];
+                    },
+                    position: 'top'
+                }
+            },
+            itemStyle: {
+                normal: {
+                    shadowBlur: 10,
+                    shadowColor: 'rgba(25, 100, 150, 0.5)',
+                    shadowOffsetY: 5,
+                    color: new echarts.graphic.RadialGradient(0.4, 0.3, 1, [{
+                        offset: 0,
+                        color: 'rgb(129, 227, 238)'
+                    }, {
+                        offset: 1,
+                        color: 'rgb(25, 183, 207)'
+                    }])
+                }
+            }
+        };
+        series.push(obj);
+    });
+
+    console.log(selected);
+    console.log(series);
+
+    let option = {
+        backgroundColor: new echarts.graphic.RadialGradient(0.3, 0.3, 0.8, [{
+            offset: 0,
+            color: '#f7f8fa'
+        }, {
+            offset: 1,
+            color: '#ffffff'
+        }]),
+        title: {
+            text: ''
+        },
+        xAxis: {
+            name:'评论次数',
+            splitLine: {
+                lineStyle: {
+                    type: 'dashed'
+                }
+            }
+        },
+        yAxis: {
+            name:'评分',
+            splitLine: {
+                lineStyle: {
+                    type: 'dashed'
+                }
+            },
+            scale: true
+        },
+        legend: {
+            data:categories,
+            selected,
+            selectedMode:'single'
+        },
+        tooltip:{
+            trigger:'item',
+            formatter: function (params){
+                let data =params.data;
+                return `名字: ${data[3]}<br/>
+                        类型:${data[4]}<br>
+                        评分:${data[2]}
+                    `
+            }
+        },
+        series
+    };
+
+    mycharts.setOption(option);
+
+
+</script>
+</body>
+</html>
